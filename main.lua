@@ -17,6 +17,8 @@ local smallFont, mediumFont, largeFont
 local paddle1, paddle2
 local ball
 
+local showFps = false
+
 
 function love.load()
     love.window.setTitle('PONG')
@@ -44,12 +46,16 @@ function love.load()
     ball = Ball(VIRTUAL_WIDTH / 2 - BALL_OFFSET, VIRTUAL_HEIGHT / 2 - BALL_OFFSET)
 end
 
+-- For utils
 function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
 
-    elseif key == 'f' then
+    elseif key == 'f' or key == 'f11' then
         push:switchFullscreen()
+
+    elseif key == 'f1' then
+        showFps = not showFps
     end
 end
 
@@ -80,7 +86,7 @@ function love.resize(w, h)
     push:resize(w, h)
 end
 
-local function displayScore()
+local function drawScore()
     love.graphics.setFont(largeFont)
 
     local halfWidth = VIRTUAL_WIDTH / 2
@@ -111,10 +117,22 @@ local function drawCenterLine(segmentHeight, gap)
 
     local y = gap
 
+
+    love.graphics.setColor(0.5, 0.5, 0.5, 1)
+
     while y + segmentHeight <= VIRTUAL_HEIGHT - gap do
         love.graphics.rectangle('fill', x, y, 2, segmentHeight)
         y = y + total
     end
+
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+local function drawFPS()
+    love.graphics.setFont(smallFont)
+    love.graphics.setColor(0, 1, 0, 1)
+    love.graphics.print(tostring(love.timer.getFPS()), 10, 10)
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 function love.draw()
@@ -122,9 +140,7 @@ function love.draw()
 
     love.graphics.clear(BG_COLOR[1], BG_COLOR[2], BG_COLOR[3], BG_COLOR[4])
 
-    love.graphics.setColor(0.5, 0.5, 0.5, 1)
     drawCenterLine(12, 6)
-    love.graphics.setColor(1, 1, 1, 1)
 
     love.graphics.setFont(smallFont)
     love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
@@ -137,7 +153,11 @@ function love.draw()
 
     ball:render()
 
-    displayScore()
+    drawScore()
+
+    if showFps then
+        drawFPS()
+    end
 
     push:finish()
 end
