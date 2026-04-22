@@ -1,4 +1,4 @@
-Class = require 'class'
+Class = require 'lib.class'
 
 Paddle = Class{}
 

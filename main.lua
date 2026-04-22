@@ -1,7 +1,7 @@
-local push = require 'push'
+local push = require 'lib.push'
 
-local Ball = require 'Ball'
-local Paddle = require 'Paddle'
+local Ball = require 'src.Ball'
+local Paddle = require 'src.Paddle'
 
 VIRTUAL_WIDTH = 320
 VIRTUAL_HEIGHT = 240
@@ -23,9 +23,9 @@ function love.load()
         pixelperfect = true
     })
 
-    smallFont = love.graphics.newFont('font.ttf', 8)
-    mediumFont = love.graphics.newFont('font.ttf', 16)
-    largeFont = love.graphics.newFont('font.ttf', 32)
+    smallFont = love.graphics.newFont('assets/font.ttf', 8)
+    mediumFont = love.graphics.newFont('assets/font.ttf', 16)
+    largeFont = love.graphics.newFont('assets/font.ttf', 32)
 
     local W_OFFSET = 8
     local H_OFFSET = 10
