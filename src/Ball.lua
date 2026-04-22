@@ -1,5 +1,7 @@
 local Class = require 'lib.class'
 
+local sounds = require 'src.sounds'
+
 local Ball = Class{}
 
 Ball.size = 4
@@ -21,6 +23,7 @@ function Ball:serve(player)
         self.dx = -math.random(120, 180)
     end
     
+    sounds.serve:play()
 end
 
 -- Returns 1 if player 1 scores, 2 if player 2 scores, nil otherwise
@@ -64,9 +67,13 @@ function Ball:collides(paddle)
     if self.y + Ball.size < paddle.y then return false end
 
     -- Collided!
-    self.dx = -self.dx * 1.02
+    self.dx = -self.dx
     self.dy = math.random(-150, 150)
-    --play sound
+    self:_speedUp()
+
+    sounds.paddleHit:stop()
+    sounds.paddleHit:play()
+
     return true
 end
 
@@ -83,11 +90,23 @@ end
 
 function Ball:_hitWall()
     self.dy = -self.dy
-    -- play sound effect
+    self:_speedUp()
+
+    sounds.wallHit:stop()
+    sounds.wallHit:play()
 end
 
 function Ball:_hitGoal()
-    -- play sound effect
+    self:reset()
+
+    sounds.goal:stop()
+    sounds.goal:play()
+end
+
+function Ball:_speedUp()
+    local multiplier = 1.02 + math.random() * (0.015)
+    self.dx = self.dx * multiplier
+    -- fix self.dy = self.dy * multiplier
 end
 
 return Ball

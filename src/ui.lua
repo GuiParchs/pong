@@ -4,6 +4,14 @@ local ui = {}
 
 local smallFont, mediumFont, largeFont
 
+local scoresDisplay = {
+    [0] = 'LÖVE',
+    [1] = '15',
+    [2] = '30',
+    [3] = '40',
+    [4] = 'ADV'
+}
+
 local function getPlayerDisplayName(player)
     if player == 1 then
         return 'P1'
@@ -34,29 +42,23 @@ function ui.drawServeText(playerServing)
     love.graphics.printf('Press ' .. key .. ' to serve', 0, 20, VIRTUAL_WIDTH, 'center')
 end
 
-function ui.drawScore(score1, score2)
-    love.graphics.setFont(largeFont)
+local function drawScore(display, x, y, width)
+    love.graphics.printf(display, x, y, width, 'center')
+end
 
+function ui.drawScoreBoard(score1, score2)
     local halfWidth = VIRTUAL_WIDTH / 2
     local h = VIRTUAL_HEIGHT / 5
 
-    -- p1
-    love.graphics.printf(
-        tostring(score1),
-        0,
-        h,
-        halfWidth,
-        'center'
-    )
+    love.graphics.setFont(mediumFont)
 
-    -- p2
-    love.graphics.printf(
-        tostring(score2),
-        halfWidth,
-        h,
-        halfWidth,
-        'center'
-    )
+    if score1 == 3 and score2 == 3 then
+        drawScore('DEUCE', 0, h, halfWidth)
+        drawScore('DEUCE', halfWidth, h, halfWidth)
+    else
+        drawScore(scoresDisplay[score1], 0, h, halfWidth)
+        drawScore(scoresDisplay[score2], halfWidth, h, halfWidth)
+    end
 end
 
 function ui.drawCenterNet(segmentHeight, gap)
