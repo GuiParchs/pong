@@ -4,6 +4,7 @@ local Ball = require 'src.Ball'
 local Paddle = require 'src.Paddle'
 
 local gameState = require 'src.GameState'
+local ui = require 'src.ui'
 
 VIRTUAL_WIDTH = 320
 VIRTUAL_HEIGHT = 240
@@ -13,7 +14,7 @@ WINDOW_HEIGHT = 768
 
 local BG_COLOR = {40/255, 45/255, 52/255, 1}
 
-local smallFont, mediumFont, largeFont
+
 local paddle1, paddle2
 local ball
 
@@ -25,6 +26,8 @@ function love.load()
     
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
+    math.randomseed(os.time())
+
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
         resizable = true,
@@ -32,9 +35,7 @@ function love.load()
         pixelperfect = true
     })
 
-    smallFont = love.graphics.newFont('assets/font.ttf', 8)
-    mediumFont = love.graphics.newFont('assets/font.ttf', 16)
-    largeFont = love.graphics.newFont('assets/font.ttf', 32)
+    ui.loadFonts()
 
     local W_OFFSET = 8
     local H_OFFSET = 10
@@ -44,19 +45,6 @@ function love.load()
 
     local BALL_OFFSET = Ball.size / 2
     ball = Ball(VIRTUAL_WIDTH / 2 - BALL_OFFSET, VIRTUAL_HEIGHT / 2 - BALL_OFFSET)
-end
-
--- For utils
-function love.keypressed(key)
-    if key == 'escape' then
-        love.event.quit()
-
-    elseif key == 'f' or key == 'f11' then
-        push:switchFullscreen()
-
-    elseif key == 'f1' then
-        showFps = not showFps
-    end
 end
 
 function love.update(dt)
@@ -82,57 +70,33 @@ function love.update(dt)
     paddle2:update(dt)
 end
 
-function love.resize(w, h)
-    push:resize(w, h)
-end
-
-local function drawScore()
-    love.graphics.setFont(largeFont)
-
-    local halfWidth = VIRTUAL_WIDTH / 2
-    local h = VIRTUAL_HEIGHT / 5
-
-    -- p1
-    love.graphics.printf(
-        tostring(gameState.score[1]),
-        0,
-        h,
-        halfWidth,
-        'center'
-    )
-
-    -- p2
-    love.graphics.printf(
-        tostring(gameState.score[2]),
-        halfWidth,
-        h,
-        halfWidth,
-        'center'
-    )
-end
-
-local function drawCenterLine(segmentHeight, gap)
-    local total = segmentHeight + gap
-    local x = math.floor(VIRTUAL_WIDTH / 2 - 1)
-
-    local y = gap
-
-
-    love.graphics.setColor(0.5, 0.5, 0.5, 1)
-
-    while y + segmentHeight <= VIRTUAL_HEIGHT - gap do
-        love.graphics.rectangle('fill', x, y, 2, segmentHeight)
-        y = y + total
+function love.keypressed(key)
+    -- Global keys
+    if key == 'escape' then
+        love.event.quit()
+    elseif key == 'f' or key == 'f11' then
+        push:switchFullscreen()
+    elseif key == 'f1' then
+        showFps = not showFps
     end
 
-    love.graphics.setColor(1, 1, 1, 1)
-end
+    -- GameState logic
 
-local function drawFPS()
-    love.graphics.setFont(smallFont)
-    love.graphics.setColor(0, 1, 0, 1)
-    love.graphics.print(tostring(love.timer.getFPS()), 10, 10)
-    love.graphics.setColor(1, 1, 1, 1)
+    -- Start
+    if gameState.state == 'start' then
+        if key == 'return' or key == 'kpenter' then
+            gameState.state = 'serve'
+            gameState.servingPlayer = math.random(2)
+        end
+
+
+    -- Serve
+    elseif gameState.state == 'serve' then
+        if gameState.servingPlayer == 1 and (key == 'return' or key == 'kpenter') or
+           gameState.servingPlayer == 2 and key == 'space' then
+            gameState.state = 'playing'
+        end
+    end
 end
 
 function love.draw()
@@ -140,22 +104,31 @@ function love.draw()
 
     love.graphics.clear(BG_COLOR[1], BG_COLOR[2], BG_COLOR[3], BG_COLOR[4])
 
-    drawCenterLine(12, 6)
+    if gameState.state == 'start' then
+        ui.drawStartText()
+    else
+        ui.drawScore(gameState.score[1], gameState.score[2])
+    end
 
-    love.graphics.setFont(smallFont)
-    love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf('Press Enter to start', 0, 20, VIRTUAL_WIDTH, 'center')
+    if gameState.state == 'serve' then
+        ui.drawServeText(gameState.servingPlayer)
+
+    elseif gameState.state == 'playing' then
+        ui.drawCenterNet(12, 6)
+    end
 
     paddle1:render()
     paddle2:render()
 
     ball:render()
 
-    drawScore()
-
     if showFps then
-        drawFPS()
+        ui.drawFPS()
     end
 
     push:finish()
+end
+
+function love.resize(w, h)
+    push:resize(w, h)
 end
