@@ -2,7 +2,9 @@ local gameState = require 'src.GameState'
 
 local ui = {}
 
-local smallFont, mediumFont, largeFont
+local smallFont, mediumFont
+
+local lastMult = 0
 
 local scoresDisplay = {
     [0] = 'LÖVE',
@@ -26,7 +28,6 @@ end
 function ui.loadFonts()
     smallFont = love.graphics.newFont('assets/font.ttf', 8)
     mediumFont = love.graphics.newFont('assets/font.ttf', 16)
-    largeFont = love.graphics.newFont('assets/font.ttf', 32)
 end
 
 function ui.drawStartText()
@@ -99,6 +100,23 @@ function ui.drawFPS()
     love.graphics.setFont(smallFont)
     love.graphics.setColor(0, 1, 0, 1)
     love.graphics.print(tostring(love.timer.getFPS()), 10, 10)
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+function ui.drawDebug(ball)
+    local h = VIRTUAL_HEIGHT - 30
+
+    love.graphics.setFont(smallFont)
+    love.graphics.setColor(0, 1, 0, 1)
+
+    love.graphics.printf(string.format('dx: %d', ball.dx), 10, h, VIRTUAL_WIDTH, 'left')
+    love.graphics.printf(string.format('dy: %d', ball.dy), 10, h + 20, VIRTUAL_WIDTH, 'left')
+
+
+    love.graphics.printf(string.format('speed: %d', math.abs(ball.lastSpeed or 0)), 0, h, VIRTUAL_WIDTH - 10, 'right')
+    love.graphics.printf(string.format('bonus factor: %.3f', ball.bonusFactor), 0, h + 20, VIRTUAL_WIDTH - 10, 'right')
+
+
     love.graphics.setColor(1, 1, 1, 1)
 end
 

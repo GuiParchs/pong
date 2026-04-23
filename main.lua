@@ -15,6 +15,8 @@ WINDOW_HEIGHT = 768
 
 local BG_COLOR = {40/255, 45/255, 52/255}
 
+Debug = false
+
 
 local paddle1, paddle2
 local ball
@@ -121,6 +123,9 @@ function love.keypressed(key)
     elseif key == 'f1' then
         showFps = not showFps
         sounds.select:play()
+    elseif key == 'f2' then
+        Debug = not Debug
+        sounds.select:play()
     end
 
     -- GameState logic
@@ -142,10 +147,16 @@ function love.keypressed(key)
             gameState.state = 'playing'
             ball:serve(gameState.servingPlayer)
         end
-    end
+    
+    elseif gameState.state == 'playing' then
+        if key == '0' then
+            gameState.state = 'serve'
+            ball:reset()
+        end
 
-    -- GameOver
-    if gameState.state == 'gameover' then
+
+    --GameOver
+    elseif gameState.state == 'gameover' then
         if key == 'return' or key == 'kpenter' then
             gameState.state = 'start'
             gameState.score = {0, 0}
@@ -182,6 +193,10 @@ function love.draw()
 
     if showFps then
         ui.drawFPS()
+    end
+
+    if Debug then
+        ui.drawDebug(ball)
     end
 
     push:finish()
