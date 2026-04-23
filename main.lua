@@ -3,6 +3,7 @@ local push = require 'lib.push'
 local Ball = require 'src.Ball'
 local Paddle = require 'src.Paddle'
 
+local cpu = require 'src.cpu'
 local gameState = require 'src.GameState'
 local sounds = require 'src.sounds'
 local ui = require 'src.ui'
@@ -52,6 +53,33 @@ function love.load()
     sounds.load()
 end
 
+local function handlePaddleInput(paddle, upKeys, downKeys)
+    local upPressed = false
+    local downPressed = false
+
+    for i = 1, #upKeys do
+        if love.keyboard.isDown(upKeys[i]) then
+            upPressed = true
+            break
+        end
+
+        if love.keyboard.isDown(downKeys[i]) then
+            downPressed = true
+            break
+        end
+    end
+
+    if upPressed and downPressed then
+        paddle:move(0)
+    elseif upPressed then
+        paddle:move(-1)
+    elseif downPressed then
+        paddle:move(1)
+    else
+        paddle:move(0)
+    end
+end
+
 function love.update(dt)
     if isQuitting then
         quitTimer = quitTimer - dt
@@ -61,22 +89,25 @@ function love.update(dt)
         end
     end
 
-    -- Player 1
-    if love.keyboard.isDown('w') then
-        paddle1:move(-1)
-    elseif love.keyboard.isDown('s') then
-        paddle1:move(1)
-    else
-        paddle1:move(0)
+    if gameState.state == 'start' then
+        return
     end
 
-    -- Player 2
-    if love.keyboard.isDown('up') then
-        paddle2:move(-1)
-    elseif love.keyboard.isDown('down') then
-        paddle2:move(1)
+    -- Gameplay
+
+    if gameState.mode == 'pvp' then
+        -- Player 1
+        handlePaddleInput(paddle1, {'w'}, {'s'})
+
+        -- Player 2
+        handlePaddleInput(paddle2, {'up'}, {'down'})
+
     else
-        paddle2:move(0)
+        -- Player 1
+        handlePaddleInput(paddle1, {'w', 'up'}, {'s', 'down'})
+
+        -- CPU
+        cpu.handleGame(dt)
     end
 
     paddle1:update(dt)
@@ -131,7 +162,15 @@ function love.keypressed(key)
     -- GameState logic
     -- Start
     if gameState.state == 'start' then
-        if key == 'return' or key == 'kpenter' then
+        if key == 'w' or key == 'up' or key == 's' or key == 'down' then
+            gameState.mode = gameState.mode == 'pvp' and 'mvm' or 'pvp'
+            sounds.select:play()
+
+        elseif key == 'return' or key == 'kpenter' then
+            if gameState.mode == 'mvm' then
+                cpu.setVariables(ball, paddle2)
+            end
+
             gameState.state = 'serve'
             gameState.servingPlayer = math.random(2)
             sounds.select:play()
@@ -141,8 +180,8 @@ function love.keypressed(key)
     -- Serve
     elseif gameState.state == 'serve' then
 
-        if gameState.servingPlayer == 1 and (key == 'return' or key == 'kpenter') or
-           gameState.servingPlayer == 2 and key == 'space' then
+        if (key == 'return' or key == 'kpenter') and gameState.servingPlayer == 1 or
+           key == 'space' and gameState.servingPlayer == 2 and gameState.mode == 'pvp' then
 
             gameState.state = 'playing'
             ball:serve(gameState.servingPlayer)
@@ -172,13 +211,14 @@ function love.draw()
 
     if gameState.state == 'start' then
         ui.drawStartText()
+        ui.drawStartOptions(gameState.mode)
     else
         ui.drawCenterNet(12, 6)
         ui.drawScoreBoard(gameState.score[1], gameState.score[2])
     end
 
     if gameState.state == 'serve' then
-        ui.drawServeText(gameState.servingPlayer)
+        ui.drawServeText(gameState.servingPlayer, gameState.mode)
         ui.drawGameInfo(gameState.score[1], gameState.score[2])
 
     elseif gameState.state == 'gameover' then

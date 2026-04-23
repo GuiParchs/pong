@@ -1,10 +1,10 @@
 local GameState = {}
 
-GameState.score = {0, 0}
+GameState.state = 'start'
 
 GameState.mode = 'pvp'
 
-GameState.state = 'start'
+GameState.score = {0, 0}
 
 GameState.servingPlayer = nil
 
