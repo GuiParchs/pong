@@ -92,15 +92,20 @@ function love.update(dt)
     if scorePlayer then
         local opposingPlayer = scorePlayer == 1 and 2 or 1
 
-        if gameState.score[scorePlayer] == 3 and gameState.score[opposingPlayer] == 4 then
+        if gameState.score[scorePlayer] == 3 and gameState.score[opposingPlayer] < 3 then
+            gameState.score[scorePlayer] = 5 -- win
+        elseif gameState.score[scorePlayer] == 3 and gameState.score[opposingPlayer] == 4 then
             gameState.score[opposingPlayer] = 3
         else
             gameState.score[scorePlayer] = gameState.score[scorePlayer] + 1
         end
 
-
-        gameState.state = 'serve'
-        gameState.servingPlayer = opposingPlayer
+        if gameState.score[scorePlayer] == 5 then
+            gameState.state = 'gameover'
+        else
+            gameState.state = 'serve'
+            gameState.servingPlayer = opposingPlayer
+        end
     end
 end
 
@@ -138,6 +143,15 @@ function love.keypressed(key)
             ball:serve(gameState.servingPlayer)
         end
     end
+
+    -- GameOver
+    if gameState.state == 'gameover' then
+        if key == 'return' or key == 'kpenter' then
+            gameState.state = 'start'
+            gameState.score = {0, 0}
+            sounds.select:play()
+        end
+    end
 end
 
 function love.draw()
@@ -154,6 +168,10 @@ function love.draw()
 
     if gameState.state == 'serve' then
         ui.drawServeText(gameState.servingPlayer)
+        ui.drawGameInfo(gameState)
+
+    elseif gameState.state == 'gameover' then
+        ui.drawGameOverText(gameState.score[1], gameState.score[2])
     end
 
 

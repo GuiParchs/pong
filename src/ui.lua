@@ -9,7 +9,8 @@ local scoresDisplay = {
     [1] = '15',
     [2] = '30',
     [3] = '40',
-    [4] = 'ADV'
+    [4] = 'ADV',
+    [5] = 'GAME'
 }
 
 local function getPlayerDisplayName(player)
@@ -40,6 +41,16 @@ function ui.drawServeText(playerServing)
     love.graphics.setFont(smallFont)
     love.graphics.printf(getPlayerDisplayName(playerServing) .. ' is serving!', 0, 10, VIRTUAL_WIDTH, 'center')
     love.graphics.printf('Press ' .. key .. ' to serve', 0, 20, VIRTUAL_WIDTH, 'center')
+end
+
+function ui.drawGameInfo(gameState)
+    local score1 = gameState.score[1]
+    local score2 = gameState.score[2]
+
+    if (score1 == 3 and score2 < 3) or (score2 == 3 and score1 < 3) or (score1 == 4 or score2 == 4) then
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('GAME POINT', 0, VIRTUAL_HEIGHT / 5 + 20, VIRTUAL_WIDTH, 'center')
+    end
 end
 
 local function drawScore(display, x, y, width)
@@ -76,6 +87,21 @@ function ui.drawCenterNet(segmentHeight, gap)
     end
 
     love.graphics.setColor(1, 1, 1, 1)
+end
+
+function ui.drawGameOverText(score1, score2)
+    local winner
+
+    if score1 > score2 then
+        winner = getPlayerDisplayName(1)
+    else
+        winner = getPlayerDisplayName(2)
+    end
+
+    love.graphics.setFont(smallFont)
+    love.graphics.printf(winner .. ' wins!', 0, 10, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Enter to restart', 0, 20, VIRTUAL_WIDTH, 'center')
+
 end
 
 function ui.drawFPS()
