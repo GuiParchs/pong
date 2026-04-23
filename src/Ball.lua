@@ -7,9 +7,12 @@ local MIN_SERVE_DX = 100
 local MAX_SERVE_DX = 150
 
 local BASE_SPEEDUP = 0.01
-local BONUS_SPEEDUP = 0.5
-local BONUS_DECAY = 0.2
-local MAX_DX = 350
+
+local BONUS_SPEEDUP = 0.3
+local BONUS_DECAY = 0.18
+local MAX_BONUS = 2
+
+local MAX_DX = 325
 local MAX_SPEED = 400
 
 local Ball = Class{}
@@ -121,7 +124,8 @@ function Ball:_hitPaddle(paddle)
     local impactPoint = 1 - math.min(1, math.abs(intersect)) -- distance from center (0 - 1)
 
     -- Apply bonus
-    self.bonusFactor = (self.bonusFactor * impactPoint * (1 - BONUS_DECAY)) + impactPoint -- sweet spot factor
+    self.bonusFactor = (self.bonusFactor * impactPoint) + impactPoint -- sweet spot factor
+    self.bonusFactor = math.min(self.bonusFactor, MAX_BONUS)
 
     -- Speed up ball
     self:_speedUp()

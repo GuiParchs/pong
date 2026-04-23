@@ -26,6 +26,11 @@ function Paddle:update(dt)
     end
 end
 
+-- direction should be -1 for up, 1 for down, and 0 for stop
+function Paddle:move(direction)
+    self.dy = Paddle.speed * direction
+end
+
 function Paddle:render()
     love.graphics.rectangle('fill', self.x, self.y, Paddle.width, Paddle.height)
 end

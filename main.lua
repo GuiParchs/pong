@@ -63,20 +63,20 @@ function love.update(dt)
 
     -- Player 1
     if love.keyboard.isDown('w') then
-        paddle1.dy = -Paddle.speed
+        paddle1:move(-1)
     elseif love.keyboard.isDown('s') then
-        paddle1.dy = Paddle.speed
+        paddle1:move(1)
     else
-        paddle1.dy = 0
+        paddle1:move(0)
     end
 
     -- Player 2
     if love.keyboard.isDown('up') then
-        paddle2.dy = -Paddle.speed
+        paddle2:move(-1)
     elseif love.keyboard.isDown('down') then
-        paddle2.dy = Paddle.speed
+        paddle2:move(1)
     else
-        paddle2.dy = 0
+        paddle2:move(0)
     end
 
     paddle1:update(dt)
