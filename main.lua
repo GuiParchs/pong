@@ -55,8 +55,8 @@ local function switchFullscreen()
 end
 
 local function switchShaders()
-    if not shader.effect then
-        shader.effect = shader.load()
+    if not shader.get() then
+        shader.load()
     end
 
     useShaders = not useShaders
@@ -92,7 +92,7 @@ function love.load()
 
     -- CRT shader effect
     if useShaders then
-        shader.effect = shader.load()
+        shader.load()
     end
 
     -- Update resolution
