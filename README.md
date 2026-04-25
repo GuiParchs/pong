@@ -14,6 +14,8 @@ A Pong recreation with CRT shaders, with PvP and AI mode.
 
 ## Special features
 
+* [F / F11]: Switch fullscreen
+
 * [F1]: Show FPS
 * [F2]: Toggle CRT filter (audio & video)
 * [F3]: Show debug info
