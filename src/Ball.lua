@@ -8,7 +8,7 @@ local MAX_SERVE_DX = 130
 
 local BASE_SPEEDUP = 0.01
 
-local BONUS_SPEEDUP = 0.53
+local BONUS_SPEEDUP = 0.52
 local BONUS_DECAY = 0.3
 local MAX_BONUS_FACTOR = 3
 
@@ -116,7 +116,7 @@ function Ball:render()
     local t = (currentSpeed - MIN_SERVE_DX) / (MAX_SPEED - MIN_SERVE_DX)
     t = math.min(math.max(t, 0), 1)
 
-    local trailSteps = math.floor(t * 8)
+    local trailSteps = math.floor(t * 10)
     
     -- Phosphor Ghosting
     for i = trailSteps, 1, -1 do
@@ -142,7 +142,7 @@ function Ball:_hitPaddle(paddle)
     local impactPoint = 1 - math.min(1, math.abs(intersect)) -- distance from center (0 - 1)
 
     -- Apply bonus
-    self.bonusFactor = (self.bonusFactor / 1.225) + impactPoint -- sweet spot factor
+    self.bonusFactor = (self.bonusFactor / 1.25) + impactPoint -- sweet spot factor
     self.bonusFactor = math.min(self.bonusFactor, MAX_BONUS_FACTOR)
 
     -- Speed up ball
@@ -158,7 +158,7 @@ end
 
 function Ball:_hitWall()
     self.dy = -self.dy
-    self.bonusFactor = self.bonusFactor / 1.25
+    self.bonusFactor = self.bonusFactor / 1.5
     self:_speedUp()
 
     sounds.play('wallHit')

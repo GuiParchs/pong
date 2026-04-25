@@ -53,19 +53,14 @@ function cpu.setVariables(ballRef, paddleRef)
 end
 
 function cpu.reset()
+    if not paddle then return end
+    
     currentTask = nil
     paddle:move(0)
     targetY = nil
 end
 
 function cpu.handleGame(dt)
-    -- Ignore start state
-    if gameState.state == 'start' then
-        cpu.reset()
-        lastGameState = nil
-        return
-    end
-
     -- Reset task if game state changes
     if lastGameState ~= gameState.state then
         lastGameState = gameState.state

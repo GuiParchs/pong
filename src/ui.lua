@@ -154,7 +154,7 @@ function ui.drawDebug(ball)
     love.graphics.printf(string.format('dy: %d', ball.dy), 10, h + 20, GAME_WIDTH, 'left')
 
 
-    love.graphics.printf(string.format('H speed: %d', math.abs(ball.lastSpeed or 0)), 0, h, GAME_WIDTH - 10, 'right')
+    love.graphics.printf(string.format('speed: %d', math.abs(ball.lastSpeed or 0)), 0, h, GAME_WIDTH - 10, 'right')
     love.graphics.printf(string.format('bonus factor: %.3f', ball.bonusFactor), 0, h + 20, GAME_WIDTH - 10, 'right')
 
 

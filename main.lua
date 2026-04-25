@@ -137,6 +137,7 @@ function love.update(dt)
     end
 
     if gameState.state == 'start' then
+        cpu.reset()
         return
     end
 
@@ -192,8 +193,15 @@ end
 function love.keypressed(key)
     -- Global keys
     if key == 'escape' then
-        isQuitting = true
-        quitTimer = 0.25
+        if gameState.state == 'start' then
+            isQuitting = true
+            quitTimer = 0.25
+        else
+            gameState.state = 'start'
+            gameState.score = {0, 0}
+            ball:reset()
+        end
+
         sounds.play('select')
     elseif key == 'f' or key == 'f11' then
         switchFullscreen()
@@ -202,10 +210,10 @@ function love.keypressed(key)
         showFps = not showFps
         sounds.play('select')
     elseif key == 'f2' then
-        Debug = not Debug
+        switchShaders()
         sounds.play('select')
     elseif key == 'f3' then
-        switchShaders()
+        Debug = not Debug
         sounds.play('select')
     end
 
